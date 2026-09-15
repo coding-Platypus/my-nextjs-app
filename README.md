@@ -1,8 +1,17 @@
 # NextCraft (my-nextjs-app)
 
+
 A modern, responsive web application built with **Next.js 14**, **React 18**, and **Tailwind CSS**. This project demonstrates foundational Next.js concepts including file-based routing, dynamic routes, Static Site Generation (`getStaticPaths` and `getStaticProps`), reusable layout architectures, active navigation state handling, and responsive UI design.
 
 ---
+
+## 🔗 Project Links
+
+- 🌐 **Live Deployed Site (Vercel):** [https://my-nextjs-app.vercel.app](https://my-nextjs-app.vercel.app) *(or your specific Vercel URL)*
+- 💻 **GitHub Repository:** [https://github.com/coding-Platypus/my-nextjs-app](https://github.com/coding-Platypus/my-nextjs-app)
+
+---
+
 
 ## 🚀 Features
 
