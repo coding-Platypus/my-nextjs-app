@@ -7,7 +7,7 @@ A modern, responsive web application built with **Next.js 14**, **React 18**, an
 
 ## 🔗 Project Links
 
-- 🌐 **Live Deployed Site (Vercel):** [https://my-nextjs-app.vercel.app](https://my-nextjs-app.vercel.app) *(or your specific Vercel URL)*
+- 🌐 **Live Deployed Site (Vercel):** [https://my-nextjs-app.vercel.app](https://my-nextjs-app-drab-eight.vercel.app/)](https://my-nextjs-app.vercel.app) *(or your specific Vercel URL)*
 - 💻 **GitHub Repository:** [https://github.com/coding-Platypus/my-nextjs-app](https://github.com/coding-Platypus/my-nextjs-app)
 
 ---
