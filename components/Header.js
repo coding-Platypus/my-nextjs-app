@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { Menu, X, BookOpen, Home, User, Mail, Sparkles } from 'lucide-react';
+import { Menu, X, BookOpen, Home, User, Mail, Sparkles, ShoppingBag, LayoutDashboard } from 'lucide-react';
 
 export default function Header() {
   const router = useRouter();
@@ -9,6 +9,8 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: Home },
+    { name: 'Products', href: '/products', icon: ShoppingBag, badge: 'SSG' },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, badge: 'CSR' },
     { name: 'Blog', href: '/blog', icon: BookOpen },
     { name: 'About', href: '/about', icon: User },
     { name: 'Contact', href: '/contact', icon: Mail },
@@ -44,7 +46,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => {
               const active = isActive(link.href);
               const Icon = link.icon;
@@ -52,7 +54,7 @@ export default function Header() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  className={`relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                     active
                       ? 'bg-emerald-50 text-emerald-700 font-semibold shadow-sm ring-1 ring-emerald-200'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -60,6 +62,13 @@ export default function Header() {
                 >
                   <Icon className={`w-4 h-4 ${active ? 'text-emerald-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
                   <span>{link.name}</span>
+                  {link.badge && (
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold uppercase ${
+                      active ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -68,10 +77,10 @@ export default function Header() {
           {/* Right Action / Mobile menu button */}
           <div className="flex items-center space-x-3">
             <Link
-              href="/blog"
-              className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm hover:shadow transition"
+              href="/products"
+              className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm hover:shadow transition"
             >
-              Explore Articles
+              Shop SSG
             </Link>
 
             <button
@@ -97,24 +106,31 @@ export default function Header() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium transition ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition ${
                   active
                     ? 'bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-emerald-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${active ? 'text-emerald-600' : 'text-slate-400'}`} />
-                <span>{link.name}</span>
+                <div className="flex items-center space-x-3">
+                  <Icon className={`w-5 h-5 ${active ? 'text-emerald-600' : 'text-slate-400'}`} />
+                  <span>{link.name}</span>
+                </div>
+                {link.badge && (
+                  <span className="text-[10px] px-2 py-0.5 rounded font-bold uppercase bg-slate-100 text-slate-600">
+                    {link.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
           <div className="pt-2">
             <Link
-              href="/blog"
+              href="/products"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow transition"
+              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow transition"
             >
-              Explore Articles
+              Explore Products (SSG)
             </Link>
           </div>
         </div>
@@ -122,4 +138,3 @@ export default function Header() {
     </header>
   );
 }
-

@@ -17,11 +17,11 @@ export default function Footer() {
               <span>NextCraft</span>
             </Link>
             <p className="text-slate-400 text-sm max-w-sm leading-relaxed">
-              A foundational Next.js project showcasing file-based routing, dynamic paths, static site generation, responsive Tailwind layouts, and component reusability.
+              Demonstrating Next.js data fetching strategies (SSG, SSR, CSR with SWR), custom API routes, file-based routing, and responsive Tailwind UI design.
             </p>
             <div className="flex items-center space-x-4 pt-2">
               <a
-                href="https://github.com"
+                href="https://github.com/coding-Platypus/my-nextjs-app"
                 target="_blank"
                 rel="noreferrer"
                 className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition"
@@ -53,12 +53,19 @@ export default function Footer() {
           {/* Navigation Links */}
           <div>
             <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-4">
-              Navigation
+              Data Fetching Routes
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/" className="hover:text-emerald-400 transition">
-                  Home
+                <Link href="/products" className="hover:text-emerald-400 transition flex items-center space-x-2">
+                  <span>Products</span>
+                  <span className="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded">SSG</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="hover:text-emerald-400 transition flex items-center space-x-2">
+                  <span>Dashboard</span>
+                  <span className="text-[10px] bg-sky-950 text-sky-400 px-1.5 py-0.5 rounded">CSR SWR</span>
                 </Link>
               </li>
               <li>
@@ -82,24 +89,24 @@ export default function Footer() {
           {/* Quick Info & Tech Stack */}
           <div>
             <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-4">
-              Built With
+              Strategies Used
             </h3>
             <ul className="space-y-2.5 text-sm text-slate-400">
               <li className="flex items-center space-x-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>Next.js 14 (Pages Router)</span>
+                <span>SSG: getStaticProps (Products)</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>React 18</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                <span>SSR: getServerSideProps ([id])</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>Tailwind CSS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                <span>CSR: SWR (Dashboard 10s auto-refresh)</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>Static Site Generation (SSG)</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                <span>API Route: /api/hello</span>
               </li>
             </ul>
           </div>
@@ -107,13 +114,12 @@ export default function Footer() {
 
         {/* Bottom copyright line */}
         <div className="pt-8 mt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {currentYear} my-nextjs-app. All rights reserved.</p>
+          <p>© {currentYear} NextCraft (my-nextjs-app). All rights reserved.</p>
           <p className="flex items-center">
-            Built with Next.js &amp; Tailwind CSS
+            Built with Next.js 14, SWR &amp; Tailwind CSS
           </p>
         </div>
       </div>
     </footer>
   );
 }
-
