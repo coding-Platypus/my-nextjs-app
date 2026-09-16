@@ -1,16 +1,17 @@
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ShoppingBag, Star, Zap, ArrowRight, Tag, Search, Filter } from 'lucide-react';
+import { ShoppingBag, Star, Zap, ArrowRight, Search } from 'lucide-react';
+import { fallbackProducts } from '@/data/productsData';
 
-export default function ProductsPage({ products, error, generatedAt }) {
+export default function ProductsPage({ products, isFallback, generatedAt }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const categories = ['All', ...new Set((products || []).map((p) => p.category))];
+  const productList = products && products.length > 0 ? products : fallbackProducts;
+  const categories = ['All', ...new Set(productList.map((p) => p.category))];
 
-  const filteredProducts = (products || []).filter((product) => {
+  const filteredProducts = productList.filter((product) => {
     const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -76,16 +77,8 @@ export default function ProductsPage({ products, error, generatedAt }) {
           </div>
         </div>
 
-        {/* Error Fallback */}
-        {error && (
-          <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-center max-w-xl mx-auto">
-            <p className="font-semibold">{error}</p>
-            <p className="text-sm mt-1">Please check your internet connection or API availability.</p>
-          </div>
-        )}
-
         {/* Products Grid */}
-        {filteredProducts.length === 0 && !error ? (
+        {filteredProducts.length === 0 ? (
           <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-md mx-auto space-y-3">
             <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
             <h3 className="text-lg font-bold text-slate-900">No products found</h3>
@@ -166,33 +159,42 @@ export default function ProductsPage({ products, error, generatedAt }) {
   );
 }
 
-// 1. Static Site Generation (SSG) with getStaticProps
+// Static Site Generation (SSG) with getStaticProps
 export async function getStaticProps() {
   try {
-    const res = await fetch('https://fakestoreapi.com/products');
+    // 5-second fetch timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch('https://fakestoreapi.com/products', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.statusText}`);
+      throw new Error(`API responded with status: ${res.status}`);
     }
     const products = await res.json();
+
+    if (!Array.isArray(products) || products.length === 0) {
+      throw new Error('Empty product list received');
+    }
 
     return {
       props: {
         products,
+        isFallback: false,
         generatedAt: new Date().toISOString(),
       },
-      // Re-generate page every 60 seconds (Incremental Static Regeneration - ISR)
       revalidate: 60,
     };
   } catch (error) {
-    console.error('SSG getStaticProps error:', error.message);
+    console.warn('SSG: Using reliable fallback products dataset due to API unavailability:', error.message);
     return {
       props: {
-        products: [],
-        error: 'Unable to fetch products at build time. Please try again later.',
+        products: fallbackProducts,
+        isFallback: true,
         generatedAt: new Date().toISOString(),
       },
-      revalidate: 10,
+      revalidate: 60,
     };
   }
 }
-

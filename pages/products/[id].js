@@ -1,7 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { ArrowLeft, Star, Server, CheckCircle2, ShieldCheck, Truck, ShoppingCart, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Star, Server, CheckCircle2, ShieldCheck, Truck, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import { getFallbackProductById } from '@/data/productsData';
 
 export default function ProductDetailPage({ product, renderedAt, error }) {
   const [added, setAdded] = useState(false);
@@ -191,20 +192,19 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
   );
 }
 
-// 2. Server-Side Rendering (SSR) with getServerSideProps
+// Server-Side Rendering (SSR) with getServerSideProps
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
   try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (!res.ok) {
-      return {
-        props: {
-          product: null,
-          error: `Product #${id} not found on server.`,
-          renderedAt: new Date().toISOString(),
-        },
-      };
+      throw new Error(`API status ${res.status}`);
     }
     const product = await res.json();
 
@@ -215,14 +215,24 @@ export async function getServerSideProps({ params }) {
       },
     };
   } catch (err) {
-    console.error('SSR getServerSideProps error:', err.message);
+    console.warn(`SSR: Using fallback product for #${id} due to API issue:`, err.message);
+    const fallback = getFallbackProductById(id);
+
+    if (fallback) {
+      return {
+        props: {
+          product: fallback,
+          renderedAt: new Date().toISOString(),
+        },
+      };
+    }
+
     return {
       props: {
         product: null,
-        error: 'Failed to fetch product from server.',
+        error: `Product #${id} could not be retrieved.`,
         renderedAt: new Date().toISOString(),
       },
     };
   }
 }
-
