@@ -2,12 +2,14 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { ArrowLeft, Star, Server, CheckCircle2, ShieldCheck, Truck, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import { getFallbackProductById } from '@/data/productsData';
+import { getFallbackProductById, sanitizeProductImage } from '@/data/productsData';
 
 export default function ProductDetailPage({ product, renderedAt, error }) {
   const [added, setAdded] = useState(false);
 
-  if (error || !product) {
+  const displayProduct = sanitizeProductImage(product);
+
+  if (error || !displayProduct) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
         <div className="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto">
@@ -38,8 +40,8 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
   return (
     <>
       <Head>
-        <title>{product.title} (SSR) | NextCraft</title>
-        <meta name="description" content={product.description} />
+        <title>{displayProduct.title} (SSR) | NextCraft</title>
+        <meta name="description" content={displayProduct.description} />
       </Head>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-10">
@@ -62,11 +64,15 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
         {/* Product Details Main Card */}
         <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Product Image Column */}
-          <div className="flex items-center justify-center p-8 bg-slate-50/80 rounded-2xl border border-slate-100 h-96 sm:h-[480px]">
+          <div className="flex items-center justify-center p-8 bg-slate-50 rounded-2xl border border-slate-100 h-96 sm:h-[480px]">
             <img
-              src={product.image}
-              alt={product.title}
-              className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
+              src={displayProduct.image}
+              alt={displayProduct.title}
+              className="max-h-full max-w-full object-contain rounded-xl hover:scale-105 transition-transform duration-300 shadow-xs"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+              }}
             />
           </div>
 
@@ -75,34 +81,34 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold uppercase tracking-wider capitalize">
-                  {product.category}
+                  {displayProduct.category}
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  Product ID: #{product.id}
+                  Product ID: #{displayProduct.id}
                 </span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                {product.title}
+                {displayProduct.title}
               </h1>
 
               {/* Rating */}
-              {product.rating && (
+              {displayProduct.rating && (
                 <div className="flex items-center space-x-3 text-sm">
                   <div className="flex items-center text-amber-500">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={`w-4 h-4 ${
-                          i < Math.round(product.rating.rate)
+                          i < Math.round(displayProduct.rating.rate)
                             ? 'fill-amber-400 text-amber-400'
                             : 'text-slate-300'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="font-semibold text-slate-900">{product.rating.rate}</span>
-                  <span className="text-slate-400">({product.rating.count} customer reviews)</span>
+                  <span className="font-semibold text-slate-900">{displayProduct.rating.rate}</span>
+                  <span className="text-slate-400">({displayProduct.rating.count} customer reviews)</span>
                 </div>
               )}
             </div>
@@ -110,7 +116,7 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
             {/* Price */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-baseline space-x-3">
               <span className="text-3xl sm:text-4xl font-extrabold text-slate-900">
-                ${Number(product.price).toFixed(2)}
+                ${Number(displayProduct.price).toFixed(2)}
               </span>
               <span className="text-xs text-emerald-600 font-semibold bg-emerald-100 px-2 py-0.5 rounded">
                 In Stock &amp; Ready to Ship
@@ -123,7 +129,7 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
                 Product Description
               </h2>
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                {product.description}
+                {displayProduct.description}
               </p>
             </div>
 
@@ -177,7 +183,7 @@ export default function ProductDetailPage({ product, renderedAt, error }) {
               <span>How Server-Side Rendering (SSR) Works on this Page</span>
             </h3>
             <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-              Every time you refresh this page, <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">getServerSideProps</code> runs on the server to query <code className="bg-slate-800 px-1.5 py-0.5 rounded text-slate-200 font-mono">https://fakestoreapi.com/products/{product.id}</code> in real-time before sending the rendered HTML to the browser.
+              Every time you refresh this page, <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">getServerSideProps</code> runs on the server to query <code className="bg-slate-800 px-1.5 py-0.5 rounded text-slate-200 font-mono">https://fakestoreapi.com/products/{displayProduct.id}</code> in real-time before sending the rendered HTML to the browser.
             </p>
           </div>
           {renderedAt && (
@@ -210,18 +216,18 @@ export async function getServerSideProps({ params }) {
 
     return {
       props: {
-        product,
+        product: sanitizeProductImage(product),
         renderedAt: new Date().toISOString(),
       },
     };
   } catch (err) {
-    console.warn(`SSR: Using fallback product for #${id} due to API issue:`, err.message);
+    console.warn(`SSR: Using fallback product for #${id}:`, err.message);
     const fallback = getFallbackProductById(id);
 
     if (fallback) {
       return {
         props: {
-          product: fallback,
+          product: sanitizeProductImage(fallback),
           renderedAt: new Date().toISOString(),
         },
       };

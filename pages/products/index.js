@@ -2,13 +2,14 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ShoppingBag, Star, Zap, ArrowRight, Search } from 'lucide-react';
-import { fallbackProducts } from '@/data/productsData';
+import { fallbackProducts, sanitizeProductImage } from '@/data/productsData';
 
 export default function ProductsPage({ products, isFallback, generatedAt }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const productList = products && products.length > 0 ? products : fallbackProducts;
+  const rawList = products && products.length > 0 ? products : fallbackProducts;
+  const productList = rawList.map((p) => sanitizeProductImage(p));
   const categories = ['All', ...new Set(productList.map((p) => p.category))];
 
   const filteredProducts = productList.filter((product) => {
@@ -98,12 +99,16 @@ export default function ProductsPage({ products, isFallback, generatedAt }) {
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col justify-between group"
               >
                 {/* Product Image Thumbnail */}
-                <div className="relative w-full h-56 p-6 bg-white flex items-center justify-center border-b border-slate-100 overflow-hidden">
+                <div className="relative w-full h-56 p-4 bg-slate-50 flex items-center justify-center border-b border-slate-100 overflow-hidden">
                   <img
                     src={product.image}
                     alt={product.title}
-                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="max-h-full max-w-full object-contain rounded-lg group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+                    }}
                   />
                   <div className="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs uppercase">
                     SSG
@@ -162,9 +167,8 @@ export default function ProductsPage({ products, isFallback, generatedAt }) {
 // Static Site Generation (SSG) with getStaticProps
 export async function getStaticProps() {
   try {
-    // 5-second fetch timeout controller
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
 
     const res = await fetch('https://fakestoreapi.com/products', { signal: controller.signal });
     clearTimeout(timeoutId);
@@ -178,16 +182,18 @@ export async function getStaticProps() {
       throw new Error('Empty product list received');
     }
 
+    const sanitizedProducts = products.map((p) => sanitizeProductImage(p));
+
     return {
       props: {
-        products,
+        products: sanitizedProducts,
         isFallback: false,
         generatedAt: new Date().toISOString(),
       },
       revalidate: 60,
     };
   } catch (error) {
-    console.warn('SSG: Using reliable fallback products dataset due to API unavailability:', error.message);
+    console.warn('SSG: Using reliable fallback products dataset:', error.message);
     return {
       props: {
         products: fallbackProducts,
